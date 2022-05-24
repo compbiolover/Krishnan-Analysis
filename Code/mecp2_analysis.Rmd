@@ -35,13 +35,10 @@ library(webshot)
 
 
 ## Step Two
-Load the data and make separate data frames that are comprised of only left or right hemisphere data. The warning here is okay. When I make all columns numeric it introduces some NAs because not all columns have the same number of rows (some just have no data in that row and therefore they get an NA). I fill those NAs in with a 0. 
+Load the data and make separate data frames that are comprised of only 6 or 12 week data. The warning here is okay. When I make all columns numeric it introduces some NAs because not all columns have the same number of rows (some just have no data in that row and therefore they get an NA). I fill those NAs in with a 0. 
 ```{r loading-data, tidy=TRUE, tidy.opts=list(arrow=TRUE, indent=2), echo=FALSE, results='hide', warning=FALSE}
 #Loading the data
-setwd("~/Documents/PhD Program/Hong Lab/Projects/Krishnan-lab-Analysis/Data")
-
-
-mecp2_data <- read.csv("~/Documents/PhD Program/Hong Lab/Projects/Krishnan-lab-Analysis/Data/mecp2_raw_histogram_data_excluded_values_removed.csv")
+mecp2_data <- read.csv("~/Documents/Work/PhD Program/Hong Lab/Projects/Krishnan-Analysis/Data/mecp2_raw_histogram_data_excluded_values_removed.csv")
 
 mecp2_metadata_6wk <- mecp2_data[1:6,1:378]
 mecp2_metadata_12wk <- mecp2_data[1:6,379:811]
@@ -101,7 +98,7 @@ gmm_mod_12wk <- apply(mecp2_intensity_12wk, 2, densityMclust, G = 1)
 ## Step Four: Now plotting and then saving all of the density plots for 6 week year old data 
 ```{r 6-week-gmm-plots-being-saved, echo=FALSE, message=FALSE}
 #Plotting the results and saving the mean to do more analysis later
-setwd("~/Documents/PhD Program/Hong Lab/Projects/Krishnan-lab-Analysis/Figures/Mecp2_figures")
+setwd("~/Documents/Work/PhD Program/Hong Lab/Projects/Krishnan-Analysis/Figures/Mecp2_figures")
 first_means_6wk <- rep(0, 816)
 second_means_6wk <- rep(0, 816)
 all_plots <- list()
@@ -134,7 +131,7 @@ for(gm in gmm_mod_6wk){
 ## Plotting and saving for 12 week old data
 ```{r 12-week-gmm-plots-being-saved, echo=FALSE, message=FALSE}
 #Plotting the results and saving the mean to do more analysis later
-setwd("~/Documents/PhD Program/Hong Lab/Projects/Krishnan-lab-Analysis/Figures/Mecp2_figures")
+setwd("~/Documents/Work/PhD Program/Hong Lab/Projects/Krishnan-Analysis/Figures/Mecp2_figures")
 first_means_12wk <- rep(0, 816)
 second_means_12wk <- rep(0, 816)
 all_plots <- list()
@@ -227,7 +224,7 @@ mecp2_6_12_pos <- bind_rows(mecp2_data_processed_6wk_simp_pos, mecp2_data_proces
 
 #Not needed to be run every time since we have already saved the file
 saveRDS(mecp2_6_12_pos,
-        file = "~/Documents/PhD Program/Hong Lab/Projects/Krishnan-lab-Analysis/Data/mecp2_6_12_pos.rds")
+        file = "~/Documents/Work/PhD Program/Hong Lab/Projects/Krishnan-Analysis/Data/mecp2_6_12_pos.rds")
 
 #Performing all KW tests for the overall model and then uncorrected Dunn's tests
 #for each of the particular pairwise comparisons in line with collaborator's
@@ -295,11 +292,12 @@ mecp2_6_12_pos$Combo <- factor(mecp2_6_12_pos$Combo, levels = c("WT_6 wk",
 
 #Plot
 total_plot <- ggplot(aes(x=Combo,y=Mean, fill=Condition), data = mecp2_6_12_pos)+
-  geom_violin(draw_quantiles = c(0.25, 0.5, 0.75), fill="white", colour="black")+ theme(panel.background = element_blank(),
-                       plot.title = element_text(hjust = 0.5, face = "bold"),
-                       axis.title = element_text(face = "bold"),
-                       axis.text = element_text(face = "bold"),
-                       legend.position = "none")+
+  geom_violin(draw_quantiles = c(0.25, 0.5, 0.75), fill="white", colour="black")+
+  theme(panel.background = element_blank(),
+        plot.title = element_text(hjust = 0.5, face = "bold"),
+        axis.title = element_text(face = "bold"),
+        axis.text = element_text(face = "bold"),
+        legend.position = "none")+
   ylab("Mean MECP2 Intensity (a.u.)")+
   xlab("")+
   ggtitle("PV Nuclei")+
@@ -337,11 +335,12 @@ total_plot_pos
 
 Now doing all the statistical analysis and plotting for the Non-PV Nuclei (PNN-neg) containing samples
 ```{r statistical-analysis-for-non-pv-nuclei, echo=FALSE}
-mecp2_6_12_neg <- bind_rows(mecp2_data_processed_6wk_simp_neg, mecp2_data_processed_12wk_simp_neg)
+mecp2_6_12_neg <- bind_rows(mecp2_data_processed_6wk_simp_neg,
+                            mecp2_data_processed_12wk_simp_neg)
 
 #Only need to run this once because we are saving the data frame
 saveRDS(mecp2_6_12_neg,
-        file = "~/Documents/PhD Program/Hong Lab/Projects/Krishnan-lab-Analysis/Data/mecp2_6_12_neg.rds")
+        file = "~/Documents/Work/PhD Program/Hong Lab/Projects/Krishnan-Analysis/Data/mecp2_6_12_neg.rds")
 
 
 #Performing all the same statistical tests and comparisons for the 12 week data
@@ -407,11 +406,12 @@ mecp2_6_12_neg$Combo <- factor(mecp2_6_12_neg$Combo, levels = c("WT_6 wk",
 
 #Plot
 total_plot <- ggplot(aes(x=Combo,y=Mean, fill=Condition), data = mecp2_6_12_neg)+
-  geom_violin(draw_quantiles = c(0.25, 0.5, 0.75), fill="white", colour="black")+ theme(panel.background = element_blank(),
-                       plot.title = element_text(hjust = 0.5, face = "bold"),
-                       axis.title = element_text(face = "bold"),
-                       axis.text = element_text(face = "bold"),
-                       legend.position = "none")+
+  geom_violin(draw_quantiles = c(0.25, 0.5, 0.75), fill="white", colour="black")+
+  theme(panel.background = element_blank(),
+        plot.title = element_text(hjust = 0.5, face = "bold"),
+        axis.title = element_text(face = "bold"),
+        axis.text = element_text(face = "bold"),
+        legend.position = "none")+
   ylab("Mean MECP2 Intensity (a.u.)")+
   xlab("")+
   ggtitle("Non-PV Nuclei")+
@@ -457,17 +457,17 @@ combo_plot
 
 ```{r saving-combo-plot, echo=FALSE}
 #Saving the plots
-ggsave(filename = "~/Documents/PhD Program/Hong Lab/Projects/Krishnan-lab-Analysis/Figures/Mecp2_figures/mecp2_non_and_pv_together.png", device = "png",
+ggsave(filename = "~/Documents/Work/PhD Program/Hong Lab/Projects/Krishnan-Analysis/Figures/mecp2_non_and_pv_together.png", device = "png",
        units = "cm", dpi = 300, width = 32, height = 32, plot = combo_plot)
 ```
 
 ```{r saving-non-pv-plot, echo=FALSE}
-ggsave(filename = "~/Documents/PhD Program/Hong Lab/Projects/Krishnan-lab-Analysis/Figures/Mecp2_figures/mecp2_non_pv.png", device = "png",
+ggsave(filename = "~/Documents/Work/PhD Program/Hong Lab/Projects/Krishnan-Analysis/Figures/mecp2_non_pv.png", device = "png",
        units = "cm", dpi = 300, width = 32, height = 32, plot = total_plot_neg)
 ```
 
 ```{r saving-pv-plot, echo=FALSE}
-ggsave(filename = "~/Documents/PhD Program/Hong Lab/Projects/Krishnan-lab-Analysis/Figures/Mecp2_figures/mecp2_pv.png", device = "png",
+ggsave(filename = "~/Documents/Work/PhD Program/Hong Lab/Projects/Krishnan-Analysis/Figures/mecp2_pv.png", device = "png",
        units = "cm", dpi = 300, width = 32, height = 32, plot = total_plot_pos)
 ```
 
@@ -507,6 +507,7 @@ gt_icc_done <- gt_icc %>% tab_header(
   columns = c("Cohort", "Cell number", "Image")
  ) %>% opt_align_table_header(align = "center")
 ```
+
 
 ```{r gt-table-for-non-pv-mean6-mean12-displayed, echo=FALSE}
 gt_icc_done
@@ -619,8 +620,8 @@ Doing 6 week Het vs. 12 week Het lme model
 het_v_het_comp <- mecp2_6_12_neg %>% group_by(Condition) %>% 
   filter(Condition=="Het")
 
-#Now building an LME for non-PV because of high ICC of Cohort. This is the 12 
-#wk Het vs. Het model
+#Now building an LME for non-PV because of high ICC of Cohort. This is the 6 
+#week v. 12 wk Het vs. Het model
 lme_mod_het_v_het_comp <- lme(Mean~Time, data=het_v_het_comp, random = ~ 1|Cohort, 
                               method = "ML")
 
@@ -692,7 +693,7 @@ total_plot_lme
 
 ```{r saving-lme-plot, echo=FALSE}
 #Saving lme plot
-ggsave(filename = "~/Documents/PhD Program/Hong Lab/Projects/Krishnan-lab-Analysis/Figures/Mecp2_figures/lme_non_pv_plot.png",
+ggsave(filename = "~/Documents/Work/PhD Program/Hong Lab/Projects/Krishnan-Analysis/Figures/lme_non_pv_plot.png",
        device = "png", dpi = 300, units = "cm", height = 32,
        width = 32, plot = total_plot_lme)
 ```
@@ -850,7 +851,7 @@ total_plot_lme_pv
 
 ```{r saving-lme-plot-pv, echo=FALSE}
 #Saving lme plot
-ggsave(filename = "~/Documents/PhD Program/Hong Lab/Projects/Krishnan-lab-Analysis/Figures/Mecp2_figures/lme_pv_plot.png",
+ggsave(filename = "~/Documents/Work/PhD Program/Hong Lab/Projects/Krishnan-Analysis/Figures/lme_pv_plot.png",
        device = "png", dpi = 300, units = "cm", height = 32,
        width = 32, plot = total_plot_lme_pv)
 ```
@@ -882,7 +883,7 @@ colnames(icc_df) <- c("Cohort", "Cell number", "Image")
 #Making that data frame a nicer looking table
 gt_icc <- gt(icc_df)
 gt_icc_done <- gt_icc %>% tab_header(
-  title = "ICC for Non-PV MECP2 Data",
+  title = "ICC for Non-PV Het Only MECP2 Data",
   subtitle = "Intraclass Correlation Coefficient (ICC) for Mean 6 and 12 week Non-PV Het Only MECP2 data."
  ) %>% cols_align(
   align = "center",
@@ -915,5 +916,55 @@ colnames(analysis_df) <- c("M", "Design effect", "Effective size")
 analysis_df_gt <- gt(analysis_df)
 
 analysis_df_gt
+
+analysis_df_gt <- analysis_df_gt %>% tab_header(
+  title = "Power Analysis for Non-PV Het v Het Samples",
+  subtitle = "Metrics to determine what sample size is needed to determine if their are statistically significant differences that are independent of cohort"
+ ) %>% cols_align(
+  align = "center",
+  columns = c("M", "Design effect", "Effective size")
+ ) %>% opt_align_table_header(align = "center")
 ```
-Our results show that about 11.43 cohorts is what we would need to get a sample size that would be equivalent to a sample size that had no correlation/clustering. This is about 1.91 times as many cohorts. (e.g. 12 needed instead of the 6 currently done)
+Our results show that about 11.44 cohorts is what we would need to get a sample size that would be equivalent to a sample size that had no correlation/clustering. This is about 1.91 times as many cohorts. (e.g. 12 needed instead of the 6 currently done)
+
+
+
+Checking if WT only has high ICC for Keerthi
+```{r wt-only-icc, echo=FALSE}
+mecp2_6_12_neg_wt <- filter(mecp2_6_12_neg, Condition=="WT")
+
+#For Cohort
+icc_cohort <- ICCbare(x=factor(Cohort), y= Mean, data = mecp2_6_12_neg_wt)
+
+#For Cell number
+icc_cell_num <- ICCbare(x=factor(Cell_number), y= Mean, data = mecp2_6_12_neg_wt)
+
+#For Image
+icc_img <- ICCbare(x=factor(Image), y= Mean, data = mecp2_6_12_neg_wt)
+
+
+
+#Making a data frame
+icc_df <- data.frame(Cohort=icc_cohort,
+                     Cell_num=icc_cell_num, Image=icc_img)
+
+colnames(icc_df) <- c("Cohort", "Cell number", "Image")
+```
+
+```{r wt-only-gt-table-made, echo=FALSE}
+#Making that data frame a nicer looking table
+gt_icc <- gt(icc_df)
+gt_icc_done <- gt_icc %>% tab_header(
+  title = "ICC for Non-PV WT Only MECP2 Data",
+  subtitle = "Intraclass Correlation Coefficient (ICC) for Mean 6 and 12 week Non-PV WT Only MECP2 data."
+ ) %>% cols_align(
+  align = "center",
+  columns = c("Cohort", "Cell number", "Image")
+ ) %>% opt_align_table_header(align = "center")
+```
+
+
+```{r wt-only-gt-table-displayed, echo=FALSE}
+gt_icc_done
+```
+
