@@ -1110,5 +1110,111 @@ analysis_df_gt <- analysis_df_gt %>% tab_header(
 analysis_df_gt
 ```
 
+## Figure 9c comparison. We are comparing the data we have to that in the pre-print to ensure consistency
+```{r echo=FALSE}
+#Reading in the PNN data
+pnn_data <- read.csv("~/Documents/Work/PhD Program/Hong Lab/Projects/Krishnan-Analysis/Data/processed_data_PNN_031022_corrected.csv", sep = '\t')
+pnn_data2 <- read.csv("~/Documents/Work/PhD Program/Hong Lab/Projects/Krishnan-Analysis/Data/processed_data_PNN_3cohorts.csv", sep = '\t')
+```
+
+```{r echo=FALSE}
+#Subsetting to just S1BF sub-region and naive samples
+pnn_data_s1bf <- filter(pnn_data, Subregion=="S1BF" & Condition %in% c("NW", "NH"))
+pnn_data_s1bf$Condition <- gsub(x = pnn_data_s1bf$Condition, pattern = "NW", replacement = "WT")
+pnn_data_s1bf$Condition <- gsub(x = pnn_data_s1bf$Condition, pattern = "NH", replacement = "Het")
+pnn_data_s1bf$Area <- as.numeric(pnn_data_s1bf$Area)
+head(pnn_data_s1bf)
+```
+
+```{r echo=FALSE}
+#Performing the statistics test
+wilcox_test(data = pnn_data_s1bf, Area~Condition, detailed = TRUE)
+```
+PNN Figure 9 Plot
+```{r fig9-plot, fig.show='hold', echo=FALSE}
+#PNN Figure 9 Plot
+
+#Factoring the levels to control which order they are in
+pnn_data_s1bf$Condition <- factor(pnn_data_s1bf$Condition, levels = c("WT", "Het"))
+
+#Stats label for plot
+overall_label <-  create_test_label(description = "Mann Whitney U",
+                                        statistic.text = quote(italic(U)),
+                                        statistic = 8911, p = "0.414", n = 275,
+                                        detailed = TRUE, type = "expression")
+
+fig_9 <- ggplot(aes(x=Condition, y=Area, fill=Cohort), data = pnn_data_s1bf)+
+  geom_violin(colour="black", fill="white", draw_quantiles = c(0.25, 0.50, 0.75))+
+  theme(panel.background = element_blank(),
+        axis.title = element_text(face = "bold"),
+        plot.title = element_text(face = "bold", hjust = 0.5, size = 30),
+        axis.line = element_line(colour = "black"),
+        axis.text = element_text(face = "bold", size = 20),
+        legend.position = "right")+
+  xlab("")+
+  ylab(bquote("PNN Density ("~ mm^2 ~")"))+
+  geom_signif(y_position = 2.5, tip_length = 0, annotations = "ns", xmin = 1, xmax = 2)+
+  ggtitle("Adolescant")+
+  labs(subtitle = overall_label)
+
+
+fig_9 <- fig_9 + scale_x_discrete(breaks = c("WT","Het"),
+                                  labels = c("WT \n(n = 135)",
+                                             "Het \n(n = 140)"))
+
+
+pnn_coh1_wt <- filter(pnn_data_s1bf, Cohort=="102319" & Condition=="WT")
+pnn_coh1_het <- filter(pnn_data_s1bf, Cohort=="102319" & Condition=="Het")
+
+pnn_coh2_wt <- filter(pnn_data_s1bf, Cohort=="103119" & Condition=="WT")
+pnn_coh2_het <- filter(pnn_data_s1bf, Cohort=="103119" & Condition=="Het")
+
+pnn_coh3_wt <- filter(pnn_data_s1bf, Cohort=="121119A" & Condition=="WT")
+pnn_coh3_het <- filter(pnn_data_s1bf, Cohort=="121119A" & Condition=="Het")
+
+pnn_coh4_wt <- filter(pnn_data_s1bf, Cohort=="121119B" & Condition=="WT")
+pnn_coh4_het <- filter(pnn_data_s1bf, Cohort=="121119B" & Condition=="Het")
+
+fig_9 <- fig_9 + stat_summary(fun=mean, geom="point", shape=21,
+                                        size=5, aes(fill="102319"), data = pnn_coh1_wt)
+
+fig_9 <- fig_9 + stat_summary(fun=mean, geom="point", shape=21,
+                                        size=5, aes(fill="102319"), data = pnn_coh1_het)
+
+fig_9 <- fig_9 + stat_summary(fun=mean, geom="point", shape=21,
+                                        size=5, aes(fill="103119"), data = pnn_coh2_wt)
+
+fig_9 <- fig_9 + stat_summary(fun=mean, geom="point", shape=21,
+                                        size=5, aes(fill="103119"), data = pnn_coh2_het)
+
+fig_9 <- fig_9 + stat_summary(fun=mean, geom="point", shape=21,
+                                        size=5, aes(fill="121119A"), data = pnn_coh3_wt)
+
+fig_9 <- fig_9 + stat_summary(fun=mean, geom="point", shape=21,
+                                        size=5, aes(fill="121119A"), data = pnn_coh3_het)
+
+fig_9 <- fig_9 + stat_summary(fun=mean, geom="point", shape=21,
+                                        size=5, aes(fill="121119B"), data = pnn_coh4_wt)
+
+fig_9 <- fig_9 + stat_summary(fun=mean, geom="point", shape=21,
+                                        size=5, aes(fill="121119B"), data = pnn_coh4_het)
+
+fig_9 <- fig_9 + scale_fill_manual(values = c("102319"="blue", 
+                                              "103119"="purple", 
+                                              "121119A"="green",
+                                              "121119B"="magenta"))
+
+```
+
+
+```{r echo=FALSE}
+fig_9
+```
+
+```{r}
+ggsave(fig_9, device = "png", dpi = 300, width = 15, height = 15, units = "cm", filename = "~/Desktop/fig9c_for_logan.png")
+```
+
+
 ## Overall Conclusion
 Checking the `Het` only samples reveals that they have an ICC of ~0.61 which is higher than the overall of ~0.50. Looking at just them alone indicates we would need a little over 9 total cohorts. In essence this means they would need an `n` of 4 more cohorts (for a total of 10) as the value is slightly over 9 but better to have more than not enough. The `WT` only samples also have a moderate ICC value of ~0.54. In turn, they would need a little over 10 total cohorts (5 more) to account for the data dependence. This is not a big concern though because the statistical analysis remains unchanged for the lme PV samples. We will have to decide if we recommend an overall number where both `Het` and `WT` samples are inter-mixed or to offer a recommendation based on `Het` and `WT` alone.  
